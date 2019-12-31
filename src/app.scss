@@ -1,0 +1,23 @@
+.fill-bg {
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-color: transparent;
+}
+
+body {
+  color: #333;
+  font-size: 14px;
+}
+
+.page-content {
+  height: 100%;
+}
+
+.page-body {
+  height: calc(100vh - 100px);
+  overflow-x: auto;
+}
+
+.page-footer {
+  height: 100px;
+}
