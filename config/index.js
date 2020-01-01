@@ -44,6 +44,9 @@ const config = {
           generateScopedName: '[name]__[local]___[hash:base64:5]'
         }
       }
+    },
+    compile: {
+      include: ['taro-f2']
     }
   },
   h5: {
@@ -67,7 +70,8 @@ const config = {
           generateScopedName: '[name]__[local]___[hash:base64:5]'
         }
       }
-    }
+    },
+    esnextModules: ['taro-f2']
   }
 }
 

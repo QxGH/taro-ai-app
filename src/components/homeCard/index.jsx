@@ -7,28 +7,34 @@ class homeCard extends Component {
     const animationList = [
       {
         id: '1',
-        name: '图像漫画化',
-        describe: '只需上传图片，即可立刻将照片转换成卡通画风格'
-      }, {
-        id: '2',
-        name: '图像素描化',
-        describe: '只需上传图片，即可立刻将照片转换成素描风格'
-      }, {
-        id: '3',
-        name: '人像动漫化',
-        describe: '生成动漫二次元人像效果'
-      }, {
-        id: '4',
         name: '通用物体和场景识别',
         describe: '对图片内容进行识别'
       }, {
-        id: '5',
+        id: '2',
+        name: '动物识别',
+        describe: '识别图片中动物的名称'
+      }, {
+        id: '3',
         name: '植物识别',
         describe: '识别图片中植物的名称'
       }, {
+        id: '4',
+        name: '花卉识别',
+        describe: '识别图片中花卉的名称'
+      }, {
+        id: '5',
+        name: '食材识别',
+        describe: '识别图片中食材的名称'
+      }, {
         id: '6',
-        name: '动物识别',
-        describe: '识别图片中动物的名称'
+        name: '图像素描化',
+        // describe: '只需上传图片，即可立刻将照片转换成素描风格'
+        describe: '(敬请期待)'
+      }, {
+        id: '7',
+        name: '人像动漫画',
+        // describe: '只需上传图片，即可立刻将照片转换成素描风格'
+        describe: '(敬请期待)'
       }
     ]
     return (
@@ -57,7 +63,16 @@ class homeCard extends Component {
    *  card 点击事件
    */
   cardClickHandle(id) {
-    console.log(id)
+    if(id == 6 || id == 7) {
+      Taro.showToast({
+        title: '暂未开放',
+        icon: 'none'
+      })
+      return;
+    }
+    Taro.navigateTo({
+      url: `/pages/transform/index?id=${id}`
+    })
   }
 }
 export default homeCard

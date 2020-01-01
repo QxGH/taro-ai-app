@@ -9,13 +9,17 @@ body {
   font-size: 14px;
 }
 
+.page-main {
+  height: 100%;
+}
+
 .page-content {
   height: 100%;
 }
 
 .page-body {
   height: calc(100vh - 100px);
-  overflow-x: auto;
+  overflow-y: auto;
 }
 
 .page-footer {

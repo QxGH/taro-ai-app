@@ -11,12 +11,18 @@ import './app.scss'
 //   require('nerv-devtools')
 // }
 
+if (process.env.TARO_ENV !== 'alipay') {
+  require('@tarojs/async-await')
+}
+
 class App extends Component {
 
   config = {
     pages: [
       'pages/index/index',
-      'pages/about/index'
+      'pages/about/index',
+      'pages/transform/index',
+      'pages/result/index'
     ],
     window: {
       backgroundTextStyle: 'light',

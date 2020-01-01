@@ -56,7 +56,7 @@ class about extends Component {
               <Image className="person-avatar" src='https://qxtodo.com/avatar.jpg' />
             </View>
             <View className="person-name-box">
-              <Text className="person-name">请登录</Text>
+              <Text className="person-name">User</Text>
             </View>
           </View>
           <View className="menu-list-box">
