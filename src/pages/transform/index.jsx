@@ -3,6 +3,8 @@ import { View, Image, Text } from '@tarojs/components'
 
 import { ClIcon, ClActionSheet } from "mp-colorui";
 
+import Authorize from '../../components/authorize/index'
+
 import './index.scss'
 import api from '../../http/api'
 
@@ -25,7 +27,10 @@ class transform extends Component {
             text: '相册'
           }
         ]
-      }
+      },
+      domain: 'https://up-z0.qiniup.com',
+      userInfo: null, // 用户信息
+      authorizeShow: false
     }
   }
 
@@ -46,9 +51,10 @@ class transform extends Component {
           type='card'
           showCancel
           onCancel={this.actionSheetCancel.bind(this)}
-          onClick={this.actionSheetClick.bind(this)}
+          onClick={this.getOauthStatus.bind(this)}
         />
         {/* 操作面板 */}
+        <Authorize authorizeShow={this.state.authorizeShow} authorizeClose={ (val)=>this.authorizeCloseHandle(val) }></Authorize>
       </View>
     )
   }
@@ -63,6 +69,33 @@ class transform extends Component {
         show: true
       }
     })
+  }
+  // 获取用户授权结果
+  getOauthStatus = () => {
+    Taro.getSetting().then(res => {
+      if (Object.keys(res.authSetting).length === 0 || !res.authSetting['scope.userInfo']) { // 用户信息无授权
+        console.log('用户无授权信息')
+        this.toAuthHandle();
+      } else { // 用户允许授权获取用户信息
+        // 获取用户信息
+        this.getUserInfo();
+        this.actionSheetClick()
+      }
+    })
+      .catch(err => console.log(err))
+  }
+  // 获取用户信息
+
+  getUserInfo = () => {
+    Taro.getUserInfo({
+      lang: 'zh_CN'
+    }).then(res => { // 获取成功
+      this.setState(() => ({
+        userInfo: res.userInfo
+      }))
+      console.log(res)
+    })
+      .catch(err => console.log(err))
   }
 
   /**
@@ -80,7 +113,6 @@ class transform extends Component {
   /**
    * 操作面板 点击时
    */
-
   actionSheetClick(index) {
     const that = this;
     if (index == 0) {
@@ -91,7 +123,7 @@ class transform extends Component {
         sourceType: ['camera'],
         sizeType: 'compressed',
         success: (res) => {
-          this.saveTempFile(res)
+          this.getQiniuToken(res)
         },
         fail: (fail) => {
           Taro.showToast({
@@ -115,7 +147,7 @@ class transform extends Component {
         sourceType: ['album'],
         sizeType: 'compressed',
         success: (res) => {
-          this.saveTempFile(res)
+          this.getQiniuToken(res)
         },
         fail: function (fail) {
           Taro.showToast({
@@ -135,66 +167,79 @@ class transform extends Component {
     }
   }
 
-
-  saveTempFile(res) {
-    const that = this;
-    that.uploadImage(res.tempFilePaths);
-    new Promise((resolve, reject) => {
-      Taro.saveFile({
-        tempFilePath: res.tempFilePaths[0],
-        success(res_s) {
-          resolve(res_s)
-        },
-        fail(err_s) {
-          reject(err_s)
+  getQiniuToken(data) {
+    Taro.showLoading({
+      title: '加载中...'
+    });
+    let path = data.tempFilePaths[0]
+    Taro.request({
+      url: `${api.http}/qiniu/getToken`,
+      method: 'GET',
+      header: {
+        'content-type': 'multipart/form-data'
+      }
+    })
+      .then(res => {
+        Taro.hideLoading()
+        if (res.data.code == 0) {
+          this.uploadFile(res.data.data, path)
+        } else {
+          Taro.showToast({
+            title: '获取七牛Token失败',
+            icon: 'none'
+          })
         }
       })
-    })
-      .then(res_p => {
-        Taro.setStorageSync('tempFilePath', res_p.savedFilePath)
-      })
-      .catch(err_p => {
+      .catch(err => {
+        console.log(err)
+        Taro.hideLoading()
         Taro.showToast({
-          title: '临时文件出错',
+          title: '请求错误',
           icon: 'none'
         })
       })
   }
 
-
   /**
    * 上传图片
    */
-  uploadImage(tempFilePaths) {
+  uploadFile(token, path) {
     Taro.showLoading({
-      title: '加载中...'
+      title: '上传中...'
     });
+    let fileTypeArr = path.split('.')
+    // 文件类型
+    const fileType = fileTypeArr[fileTypeArr.length - 1]
+    let timestamp = Date.parse(new Date())
+    let randomNum = Math.floor(Math.random() * 1000)
+    // 文件名
+    const keyname = `temp/${timestamp}${randomNum}.${fileType}`
     Taro.uploadFile({
-      url: `${api.http}/uploadImg/`, //仅为示例，非真实的接口地址
-      filePath: tempFilePaths[0],
+      url: this.state.domain, //仅为示例，非真实的接口地址
+      filePath: path,
       name: 'file',
       formData: {
-        'user': 'test'
+        'token': token,
+        'key': keyname
+      },
+      headers: {
+        'Content-Type': 'multipart/form-data'
       },
       success: (res) => {
-        let data = JSON.parse(res.data);
-        if (data.code == 0) {
-          Taro.showToast({
-            title: '上传成功',
-            icon: 'success'
-          })
-          Taro.setStorageSync('imageBase64', data.data.url);
-          Taro.setStorageSync('imagePath', data.data.path);
-          let id = this.$router.params.id;
+        if(res.errMsg = 'uploadFile:ok') {
+          let data = JSON.parse(res.data)
+          let transformImg = data.key;
+          Taro.setStorageSync('transformImg', transformImg);
+          let type = this.$router.params.id;
           Taro.redirectTo({
-            url: `/pages/result/index?id=${id}`
+            url: `/pages/result/index?id=${type}`
           })
         } else {
           Taro.showToast({
             title: '上传失败',
             icon: 'none'
           })
-        };
+        }
       },
       fail: (err) => {
         Taro.showToast({
@@ -208,6 +253,18 @@ class transform extends Component {
     })
   }
 
+  toAuthHandle() {
+    this.setState({
+      authorizeShow: true
+    })
+  }
+
+  authorizeCloseHandle(valval) {
+    this.setState({
+      authorizeShow: false
+    })
+    this.getUserInfo();
+  }
 
 }
 

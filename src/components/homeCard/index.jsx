@@ -19,19 +19,15 @@ class homeCard extends Component {
         describe: '识别图片中植物的名称'
       }, {
         id: '4',
-        name: '花卉识别',
-        describe: '识别图片中花卉的名称'
-      }, {
-        id: '5',
         name: '食材识别',
         describe: '识别图片中食材的名称'
       }, {
-        id: '6',
+        id: '5',
         name: '图像素描化',
         // describe: '只需上传图片，即可立刻将照片转换成素描风格'
         describe: '(敬请期待)'
       }, {
-        id: '7',
+        id: '6',
         name: '人像动漫画',
         // describe: '只需上传图片，即可立刻将照片转换成素描风格'
         describe: '(敬请期待)'
@@ -63,7 +59,7 @@ class homeCard extends Component {
    *  card 点击事件
    */
   cardClickHandle(id) {
-    if(id == 6 || id == 7) {
+    if(id == 5 || id == 6) {
       Taro.showToast({
         title: '暂未开放',
         icon: 'none'

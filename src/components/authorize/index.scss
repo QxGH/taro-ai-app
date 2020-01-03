@@ -1,0 +1,62 @@
+.authorize {
+  background: #FFFFFF;
+  box-shadow: 0 -10rpx 30rpx 0 rgba(0, 0, 0, 0.20);
+  border-radius: 36rpx 36rpx 0 0;
+  width: 750rpx;
+  height: 472rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .cont {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .title {
+    font-size: 42rpx;
+    color: #333333;
+    line-height: 59rpx;
+    margin-bottom: 40rpx;
+  }
+  
+  .desc {
+    font-size: 32rpx;
+    color: #999999;
+    line-height: 45rpx;
+    margin-bottom: 140rpx;
+  }
+  
+  .btans {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+  
+  .btn {
+    line-height: 70rpx;
+    height: 70rpx;
+    width: 280rpx;
+    padding: 0;
+    border: 1rpx solid #1BAC1A;
+    border-radius: 44rpx;
+    font-size: 32rpx;
+    box-shadow: 6rpx 6rpx 8rpx rgba(0, 0, 0, 0.05);
+    margin: 0 30rpx;
+    box-sizing: border-box;
+  }
+  
+  .btn:first-child {
+    color: #1BAC1A;
+    background-color: #fff;
+  }
+  
+  .btn:last-child {
+    background: #1BAC1A;
+    color: #fff;
+  }
+  
+  .btn::after {
+    border: none;
+  }
+}

@@ -1,6 +1,6 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Image, Text } from '@tarojs/components'
-import { ClDivider } from "mp-colorui";
+import { ClDivider, ClButton } from "mp-colorui";
 
 import { F2Canvas } from "taro-f2";
 import { fixF2 } from "taro-f2/dist/weapp/common/f2-tool.ts";
@@ -27,12 +27,13 @@ class result extends Component {
   }
 
   componentWillMount() {
-    let tempFilePath = Taro.getStorageSync('tempFilePath');
+    let transformImg = Taro.getStorageSync('transformImg')
+    let path = api.qiniuaddr + transformImg
     this.setState({
       id: this.$router.params.id,
-      imageSrc: tempFilePath
+      imageSrc: path
     });
-    this.getIndex();
+    this.getIndex(path);
   }
 
   render() {
@@ -47,29 +48,38 @@ class result extends Component {
           />
         </View>
         <ClDivider color='blue'>识别结果</ClDivider>
-        <View className="chart-box"><F2Canvas ref="F2CanvasRef"></F2Canvas></View>
+        <View className="chart-box">
+          <F2Canvas ref="F2CanvasRef"></F2Canvas>
+        </View>
+        <View className="gohome-btn-box">
+          <ClButton className="gohome-btn" shape='round' bgColor='blue' long onClick={this.goHome.bind(this)} >返回首页</ClButton>
+        </View>
       </View>
     )
   }
 
-  getIndex() {
+  goHome(){
+    Taro.redirectTo({
+      url: `/pages/index/index`
+    })
+  }
+
+  getIndex(path) {
     Taro.showLoading({
       title: '加载中...'
     });
     let url = `${api.http}/ai/advancedGeneral`;
     let appType = this.$router.params.id;
-    if(appType == 1) {
+    if (appType == 1) {
       url = `${api.http}/ai/advancedGeneral`;
-    } else if(appType == 2) {
+    } else if (appType == 2) {
       url = `${api.http}/ai/animalDetect`;
-    } else if(appType == 3) {
-      url = `${api.http}/ai/animalDetect`;
-    } else if(appType == 4) {
-      url = `${api.http}/ai/flower`;
-    } else if(appType == 4) {
+    } else if (appType == 3) {
+      url = `${api.http}/ai/plantDetect`;
+    } else if (appType == 4) {
       url = `${api.http}/ai/ingredient`;
     };
-    let path = Taro.getStorageSync('imagePath');
+
     Taro.request({
       url: url,
       method: 'POST',
@@ -80,19 +90,18 @@ class result extends Component {
       .then(res => {
         Taro.hideLoading()
         Taro.showToast({
-          title: '初始化成功',
+          title: '识别成功',
           icon: 'success'
         })
         if (res.data.code == 0) {
           let AIData = JSON.parse(res.data.data.ai);
-          // console.log(AIData)
           this.setState({
             AIData: AIData.result
           });
           this.setChartData(AIData.result);
         } else {
           Taro.showToast({
-            title: '初始化失败',
+            title: '识别失败',
             icon: 'none'
           })
         }
@@ -123,12 +132,12 @@ class result extends Component {
     for (let item of AIData) {
       /**
        * type
-       * 1-通用物体识别; 2-动物识别; 3-植物识别; 4-花卉识别; 5-食材识别;
+       * 1-通用物体识别; 2-动物识别; 3-植物识别; 4-食材识别;
        */
       let type = this.$router.params.id;
       let itemName = item.name ? item.name : '';
-      let itemScore = item.score ? parseFloat(item.score): '0';
-      if(type == 1) {
+      let itemScore = item.score ? parseFloat(item.score) : '0';
+      if (type == 1) {
         itemName = item.keyword
       };
       let obj = {
@@ -139,9 +148,6 @@ class result extends Component {
       arr.push(obj);
       map[itemName] = itemScore * 100 + '%'
     };
-    console.log(arr)
-    console.log(map);
-    debugger
     this.setState({
       chartData: arr,
       chartMap: map
