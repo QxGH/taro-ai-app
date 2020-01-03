@@ -154,7 +154,10 @@ class transform extends Component {
         Taro.setStorageSync('tempFilePath', res_p.savedFilePath)
       })
       .catch(err_p => {
-        console.log(err_p)
+        Taro.showToast({
+          title: '临时文件出错',
+          icon: 'none'
+        })
       })
   }
 
@@ -174,7 +177,7 @@ class transform extends Component {
         'user': 'test'
       },
       success: (res) => {
-        const data = JSON.parse(res.data);
+        let data = JSON.parse(res.data);
         if (data.code == 0) {
           Taro.showToast({
             title: '上传成功',
@@ -182,7 +185,7 @@ class transform extends Component {
           })
           Taro.setStorageSync('imageBase64', data.data.url);
           Taro.setStorageSync('imagePath', data.data.path);
-          let id = this.$router.params.id
+          let id = this.$router.params.id;
           Taro.redirectTo({
             url: `/pages/result/index?id=${id}`
           })

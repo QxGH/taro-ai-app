@@ -14,6 +14,7 @@ class result extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      id: '',
       imageSrc: '',
       AIData: [],
       chartData: [],
@@ -28,6 +29,7 @@ class result extends Component {
   componentWillMount() {
     let tempFilePath = Taro.getStorageSync('tempFilePath');
     this.setState({
+      id: this.$router.params.id,
       imageSrc: tempFilePath
     });
     this.getIndex();
@@ -81,7 +83,6 @@ class result extends Component {
           title: '初始化成功',
           icon: 'success'
         })
-        console.log(res.data)
         if (res.data.code == 0) {
           let AIData = JSON.parse(res.data.data.ai);
           // console.log(AIData)
@@ -120,17 +121,27 @@ class result extends Component {
     let arr = [];
     let map = {};
     for (let item of AIData) {
-      console.log(item)
+      /**
+       * type
+       * 1-通用物体识别; 2-动物识别; 3-植物识别; 4-花卉识别; 5-食材识别;
+       */
+      let type = this.$router.params.id;
+      let itemName = item.name ? item.name : '';
+      let itemScore = item.score ? parseFloat(item.score): '0';
+      if(type == 1) {
+        itemName = item.keyword
+      };
       let obj = {
-        name: item.name,
-        percent: parseFloat(item.score),
+        name: itemName,
+        percent: itemScore,
         a: '1'
       };
       arr.push(obj);
-      map[item.name] = parseFloat(item.score) * 100 + '%'
+      map[itemName] = itemScore * 100 + '%'
     };
-    console.log(arr);
-    console.log(map)
+    console.log(arr)
+    console.log(map);
+    debugger
     this.setState({
       chartData: arr,
       chartMap: map
