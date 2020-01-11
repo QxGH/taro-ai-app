@@ -1,6 +1,6 @@
 import Taro, { Component } from '@tarojs/taro'
 import { View, Image, Text } from '@tarojs/components'
-import { ClTabBar, ClMenuList } from "mp-colorui";
+import { ClTabBar, ClMenuList, ClModal } from "mp-colorui";
 
 import Authorize from '../../components/authorize/index'
 import './index.scss'
@@ -12,7 +12,8 @@ class about extends Component {
       avatar: 'https://qxtodo.com/avatar.jpg',
       userName: '点击授权',
       userInfo: null, // 用户信息
-      authorizeShow: false
+      authorizeShow: false,
+      appreciateModal: false  // 赞赏 modal
     }
   }
   config = {
@@ -82,7 +83,16 @@ class about extends Component {
         <View className="page-footer">
           <ClTabBar active={1} tabs={tabsConfig} onClick={this.tabsClickHandle.bind(this)}></ClTabBar>
         </View>
-        <Authorize authorizeShow={this.state.authorizeShow} authorizeClose={ (val)=>this.authorizeCloseHandle(val) }></Authorize>
+        <Authorize authorizeShow={this.state.authorizeShow} authorizeClose={(val) => this.authorizeCloseHandle(val)}></Authorize>
+        <ClModal
+          show={this.state.appreciateModal}
+          closeWithShadow
+          close
+        >
+          <View className="weapp-wallet-box">
+            <Image className="weapp-wallet-img" src="https://qxtodo.com/taro/weapp_wallet_qrcode.png" />
+          </View>
+        </ClModal>
       </View >
     )
   }
@@ -124,9 +134,9 @@ class about extends Component {
     })
       .catch(err => console.log(err))
   }
-  
+
   toAuthHandle() {
-    if(this.state.userInfo == null) {
+    if (this.state.userInfo == null) {
       this.setState({
         authorizeShow: true
       })
@@ -141,17 +151,15 @@ class about extends Component {
   }
 
   menuListHandle(index) {
-    if(index == 2) {
+    if (index == 2) {
       Taro.showModal({
         title: '清歌挽酒',
-        content: 'V-1.0.1',
+        content: 'V-1.0.2',
         showCancel: false
       })
-    } else if(index == 1) {
-      Taro.showModal({
-        title: '提示',
-        content: '暂未开放',
-        showCancel: false
+    } else if (index == 1) {
+      this.setState({
+        appreciateModal: true
       })
     } else if (index == 0) {
       Taro.navigateTo({
