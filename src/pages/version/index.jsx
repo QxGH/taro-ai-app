@@ -24,6 +24,7 @@ class version extends Component {
                 "❤️ 新增车型识别",
                 "❤️ 新增接口 Token 验证",
                 "❤️ 新增获取用户信息",
+                "🐞 修复不能使用相机拍摄图片问题",
                 "🐞 修复 navTab 跳转问题"
               ],
               title: "1.0.1",

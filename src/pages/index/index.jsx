@@ -74,7 +74,7 @@ class Index extends Component {
    */
   tabsClickHandle(index, e){
     if(index == 1) {
-      Taro.redirectTo({
+      Taro.navigateTo({
         url: '/pages/about/index'
       })
     }

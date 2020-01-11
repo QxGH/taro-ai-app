@@ -71,7 +71,7 @@ class transform extends Component {
     })
   }
   // 获取用户授权结果
-  getOauthStatus = () => {
+  getOauthStatus = (index) => {
     Taro.getSetting().then(res => {
       if (Object.keys(res.authSetting).length === 0 || !res.authSetting['scope.userInfo']) { // 用户信息无授权
         console.log('用户无授权信息')
@@ -79,7 +79,7 @@ class transform extends Component {
       } else { // 用户允许授权获取用户信息
         // 获取用户信息
         this.getUserInfo();
-        this.actionSheetClick()
+        this.actionSheetClick(index)
       }
     })
       .catch(err => console.log(err))
@@ -114,9 +114,9 @@ class transform extends Component {
    */
   actionSheetClick(index) {
     const that = this;
+    console.log(index)
     if (index == 0) {
       // 相机
-      // 相册
       Taro.chooseImage({
         count: 1,
         sourceType: ['camera'],
