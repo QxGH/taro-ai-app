@@ -1,6 +1,6 @@
 import Taro, { Component } from '@tarojs/taro'
-import { View, Image, Text, Button } from '@tarojs/components'
-import { ClTabBar, ClMenuList, ClDrawer, ClCard } from "mp-colorui";
+import { View, Image, Text } from '@tarojs/components'
+import { ClTabBar, ClMenuList } from "mp-colorui";
 
 import Authorize from '../../components/authorize/index'
 import './index.scss'
@@ -102,7 +102,6 @@ class about extends Component {
   getOauthStatus = () => {
     Taro.getSetting().then(res => {
       if (Object.keys(res.authSetting).length === 0 || !res.authSetting['scope.userInfo']) { // 用户信息无授权
-        console.log('用户无授权信息')
         this.toAuthHandle();
       } else { // 用户允许授权获取用户信息
         // 获取用户信息
@@ -142,11 +141,10 @@ class about extends Component {
   }
 
   menuListHandle(index) {
-    console.log(index)
     if(index == 2) {
       Taro.showModal({
         title: '清歌挽酒',
-        content: 'V-1.0.0',
+        content: 'V-1.0.1',
         showCancel: false
       })
     } else if(index == 1) {
@@ -156,7 +154,7 @@ class about extends Component {
         showCancel: false
       })
     } else if (index == 0) {
-      Taro.redirectTo({
+      Taro.navigateTo({
         url: '/pages/version/index'
       })
     }

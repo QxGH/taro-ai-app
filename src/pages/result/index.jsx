@@ -1,5 +1,5 @@
 import Taro, { Component } from '@tarojs/taro'
-import { View, Image, Text } from '@tarojs/components'
+import { View, Image } from '@tarojs/components'
 import { ClDivider, ClButton } from "mp-colorui";
 
 import { F2Canvas } from "taro-f2";
@@ -9,12 +9,13 @@ import F2 from "@antv/f2/lib/index-all";
 import './index.scss'
 
 import api from '../../http/api'
+import http from '../../http/index'
 
 class result extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      id: '',
+      type: '',
       imageSrc: '',
       AIData: [],
       chartData: [],
@@ -30,7 +31,7 @@ class result extends Component {
     let transformImg = Taro.getStorageSync('transformImg')
     let path = api.qiniuaddr + transformImg
     this.setState({
-      id: this.$router.params.id,
+      type: this.$router.params.type,
       imageSrc: path
     });
     this.getIndex(path);
@@ -58,37 +59,21 @@ class result extends Component {
     )
   }
 
-  goHome(){
-    Taro.redirectTo({
-      url: `/pages/index/index`
-    })
+  goHome() {
+    Taro.navigateBack({ delta: 1 })
   }
 
   getIndex(path) {
     Taro.showLoading({
-      title: '加载中...'
+      title: '识别中...'
     });
-    let url = `${api.http}/ai/advancedGeneral`;
-    let appType = this.$router.params.id;
-    if (appType == 1) {
-      url = `${api.http}/ai/advancedGeneral`;
-    } else if (appType == 2) {
-      url = `${api.http}/ai/animalDetect`;
-    } else if (appType == 3) {
-      url = `${api.http}/ai/plantDetect`;
-    } else if (appType == 4) {
-      url = `${api.http}/ai/ingredient`;
-    };
-
-    Taro.request({
-      url: url,
-      method: 'POST',
-      data: {
-        path
-      }
-    })
+    let appType = this.$router.params.type;
+    let url = `/ai/${appType}`
+    let data = {
+      path
+    }
+    http(url, 'POST', data, {})
       .then(res => {
-        Taro.hideLoading()
         Taro.showToast({
           title: '识别成功',
           icon: 'success'
@@ -105,13 +90,10 @@ class result extends Component {
             icon: 'none'
           })
         }
+        Taro.removeStorageSync('transformImg')
       })
       .catch(err => {
-        Taro.hideLoading();
-        Taro.showToast({
-          title: '请求错误',
-          icon: 'none'
-        })
+        Taro.removeStorageSync('transformImg')
       })
   }
 
@@ -134,12 +116,14 @@ class result extends Component {
        * type
        * 1-通用物体识别; 2-动物识别; 3-植物识别; 4-食材识别;
        */
-      let type = this.$router.params.id;
+      let type = this.$router.params.type;
       let itemName = item.name ? item.name : '';
       let itemScore = item.score ? parseFloat(item.score) : '0';
-      if (type == 1) {
+      if (type == 'advancedGeneral') {
         itemName = item.keyword
-      };
+      } else if(type == 'carDetect') {
+        itemName = `${item.name} - ${item.year}`
+      }
       let obj = {
         name: itemName,
         percent: itemScore,
@@ -208,11 +192,6 @@ class result extends Component {
 
     chart.render();
   }
-
-
-
-
-
 }
 
 export default result;

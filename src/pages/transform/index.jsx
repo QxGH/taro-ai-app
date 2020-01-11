@@ -1,12 +1,12 @@
 import Taro, { Component } from '@tarojs/taro'
-import { View, Image, Text } from '@tarojs/components'
+import { View, Text } from '@tarojs/components'
 
 import { ClIcon, ClActionSheet } from "mp-colorui";
 
 import Authorize from '../../components/authorize/index'
 
 import './index.scss'
-import api from '../../http/api'
+import http from '../../http/index'
 
 
 class transform extends Component {
@@ -93,7 +93,6 @@ class transform extends Component {
       this.setState(() => ({
         userInfo: res.userInfo
       }))
-      console.log(res)
     })
       .catch(err => console.log(err))
   }
@@ -168,19 +167,12 @@ class transform extends Component {
   }
 
   getQiniuToken(data) {
-    Taro.showLoading({
-      title: '加载中...'
-    });
-    let path = data.tempFilePaths[0]
-    Taro.request({
-      url: `${api.http}/qiniu/getToken`,
-      method: 'GET',
-      header: {
-        'content-type': 'multipart/form-data'
-      }
-    })
+    let path = data.tempFilePaths[0];
+    let header = {
+      'content-type': 'multipart/form-data'
+    };
+    http('/qiniu/getToken', 'GET', {}, header)
       .then(res => {
-        Taro.hideLoading()
         if (res.data.code == 0) {
           this.uploadFile(res.data.data, path)
         } else {
@@ -189,14 +181,6 @@ class transform extends Component {
             icon: 'none'
           })
         }
-      })
-      .catch(err => {
-        console.log(err)
-        Taro.hideLoading()
-        Taro.showToast({
-          title: '请求错误',
-          icon: 'none'
-        })
       })
   }
 
@@ -230,9 +214,9 @@ class transform extends Component {
           let data = JSON.parse(res.data)
           let transformImg = data.key;
           Taro.setStorageSync('transformImg', transformImg);
-          let type = this.$router.params.id;
+          let type = this.$router.params.type;
           Taro.redirectTo({
-            url: `/pages/result/index?id=${type}`
+            url: `/pages/result/index?type=${type}`
           })
         } else {
           Taro.showToast({
